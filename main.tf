@@ -95,112 +95,142 @@ resource "azurerm_bastion_host" "example" {
 }
 
 resource "azurerm_network_security_group" "example" {
-  name                = "acceptanceTestSecurityGroup1"
+  name                = "vm_nsc"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
+}
 
-  security_rule = [{
-    name                       = "AllowSsh"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "22,3389"
-    source_address_prefix      = "10.0.2.0/24"
-    destination_address_prefix = "*"
-  }, {
-
-  }]
+resource "azurerm_network_security_rule" "Allowhttps0" {
+  name                       = "AllowSsh"
+  priority                   = 100
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_ranges     = ["22","3389"]
+  source_address_prefix      = "10.0.2.0/24"
+  destination_address_prefix = "*"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example.name
 }
 
 resource "azurerm_network_security_group" "example-bastion" {
-  name                = "acceptanceTestSecurityGroup1"
+  name                = "bstion-nsc"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
+}
 
-  security_rule = [{
-    name                       = "Allowhttps"
-    description = "addd"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "Internet"
-    destination_address_prefix = "*"
-  }, {
-    name                       = "Allowgateway"
-    priority                   = 120
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "GatewayManager"
-    destination_address_prefix = "*"
-  }, {
-    name                       = "Allowlb"
-    priority                   = 130
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "AzureLoadBalancer"
-    destination_address_prefix = "*"
-  }, {
-    name                       = "Allowcomm"
-    priority                   = 140
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "8080,5701"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-  }, {
-    name                       = "Allowssh"
-    priority                   = 150
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "22,3389"
-    source_address_prefix      = "*"
-    destination_address_prefix = "VirtualNetwork"
-  }, {
-    name                       = "Allowcloud"
-    priority                   = 160
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "AzureCloud"
-  }, {
-    name                       = "AllowcommO"
-    priority                   = 170
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "8080,5701"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-  }, {
-    name                       = "Allowinfo"
-    priority                   = 180
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }]
+resource "azurerm_network_security_rule" "Allowhttps" {
+  name                       = "Allowgateway"
+  priority                   = 120
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "443"
+  source_address_prefix      = "GatewayManager"
+  destination_address_prefix = "*"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
+}
+
+resource "azurerm_network_security_rule" "Allowhttps1" {
+  name                       = "Allowcloud"
+  priority                   = 160
+  direction                  = "Outbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "443"
+  source_address_prefix      = "*"
+  destination_address_prefix = "AzureCloud"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
+}
+
+resource "azurerm_network_security_rule" "Allowhttps2" {
+  name                       = "AllowcommO"
+  priority                   = 170
+  direction                  = "Outbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_ranges     = ["8080","5701"]
+  source_address_prefix      = "VirtualNetwork"
+  destination_address_prefix = "VirtualNetwork"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
+}
+
+resource "azurerm_network_security_rule" "Allowhttps3" {
+  name                       = "Allowinfo"
+  priority                   = 180
+  direction                  = "Outbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_range     = "80"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
+}
+
+resource "azurerm_network_security_rule" "Allowhttps4" {
+  name                       = "Allowssh"
+  priority                   = 150
+  direction                  = "Outbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_ranges    = ["22","3389"]
+  source_address_prefix      = "*"
+  destination_address_prefix = "VirtualNetwork"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
+}
+
+resource "azurerm_network_security_rule" "Allowhttps5" {
+  name                       = "Allowcomm"
+  priority                   = 140
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_ranges     = ["8080","5701"]
+  source_address_prefix      = "VirtualNetwork"
+  destination_address_prefix = "VirtualNetwork"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
+}
+
+resource "azurerm_network_security_rule" "Allowhttps6" {
+  name                       = "Allowlb"
+  priority                   = 130
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "443"
+  source_address_prefix      = "AzureLoadBalancer"
+  destination_address_prefix = "*"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
+}
+
+
+resource "azurerm_network_security_rule" "Allowhttps7" {
+  name                       = "Allowhttps"
+  priority                   = 110
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "443"
+  source_address_prefix      = "Internet"
+  destination_address_prefix = "*"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example-bastion.name
 }
 
 resource "azurerm_subnet_network_security_group_association" "example" {
@@ -212,4 +242,3 @@ resource "azurerm_subnet_network_security_group_association" "example1" {
   subnet_id                 = azurerm_subnet.bastion.id
   network_security_group_id = azurerm_network_security_group.example-bastion.id
 }
-
